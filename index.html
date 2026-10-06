@@ -188,7 +188,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
 <script type="module">
 import * as THREE from 'three';
-import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+import { toCreasedNormals } from 'three/addons/utils/BufferGeometryUtils.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const NC = 'BY-NC-SA', SA = 'BY-SA';
@@ -261,23 +261,52 @@ function resize() {
 new ResizeObserver(resize).observe(host);
 renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
 
-const loader = new STLLoader();
 const cache = new Map();
 let mesh = null, current = null;
 
+// Viewer meshes are compact copies of the STLs, built by tools/compress-models.mjs.
+async function loadMesh(m) {
+  const res = await fetch(`models/view/${m.file}.mesh.gz`);
+  if (!res.ok) throw new Error(res.status);
+  const total = +res.headers.get('Content-Length') || 0;
+  let loaded = 0;
+  const counted = res.body.pipeThrough(new TransformStream({
+    transform(chunk, ctrl) {
+      loaded += chunk.length;
+      if (current === m && total) bar.firstElementChild.style.width = Math.min(100, 100 * loaded / total) + '%';
+      ctrl.enqueue(chunk);
+    },
+  }));
+  const buf = await new Response(counted.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
+
+  const dv = new DataView(buf);
+  const vCount = dv.getUint32(4, true), tCount = dv.getUint32(8, true);
+  const min = [0, 1, 2].map(a => dv.getFloat32(12 + a * 4, true));
+  const max = [0, 1, 2].map(a => dv.getFloat32(24 + a * 4, true));
+  const q = new Uint16Array(buf, 36, vCount * 3);
+  const pos = new Float32Array(vCount * 3);
+  for (let i = 0; i < q.length; i++) {
+    const a = i % 3;
+    pos[i] = min[a] + q[i] / 65535 * (max[a] - min[a]);
+  }
+  const deltas = new Int32Array(buf, 36 + vCount * 6 + (4 - ((36 + vCount * 6) % 4)) % 4, tCount * 3);
+  const index = new Uint32Array(tCount * 3);
+  for (let i = 0, prev = 0; i < deltas.length; i++) index[i] = prev += deltas[i];
+
+  let geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  geo.setIndex(new THREE.BufferAttribute(index, 1));
+  geo.rotateX(-Math.PI / 2);          // STL Z-up → three.js Y-up
+  geo = toCreasedNormals(geo, THREE.MathUtils.degToRad(30));  // smooth curves, keep sharp edges
+  geo.computeBoundingBox();
+  geo.center();
+  geo.userData.triangles = tCount;
+  return geo;
+}
+
 function fetchGeometry(m) {
   if (!cache.has(m.file)) {
-    cache.set(m.file, new Promise((resolve, reject) => {
-      loader.load(url(m), geo => {
-        geo.rotateX(-Math.PI / 2);          // STL Z-up → three.js Y-up
-        geo.computeBoundingBox();
-        geo.center();
-        geo.computeVertexNormals();
-        resolve(geo);
-      }, e => {
-        if (current === m) bar.firstElementChild.style.width = (100 * e.loaded / (e.total || m.size)) + '%';
-      }, err => { cache.delete(m.file); reject(err); });
-    }));
+    cache.set(m.file, loadMesh(m).catch(err => { cache.delete(m.file); throw err; }));
   }
   return cache.get(m.file);
 }
@@ -291,7 +320,7 @@ async function show(m) {
   dl.href = url(m); dl.download = `${m.name}.stl`;
   overlay.hidden = false; bar.hidden = false;
   bar.firstElementChild.style.width = '0%';
-  overlayText.textContent = `Loading ${m.name} (${mb(m.size)})…`;
+  overlayText.textContent = `Loading ${m.name}…`;
   if (mesh) { scene.remove(mesh); mesh = null; }
   let geo;
   try { geo = await fetchGeometry(m); }
@@ -302,7 +331,7 @@ async function show(m) {
   scene.add(mesh);
   const box = geo.boundingBox, s = new THREE.Vector3(); box.getSize(s);
   document.getElementById('curDims').textContent =
-    `${s.x.toFixed(0)} × ${s.y.toFixed(0)} × ${s.z.toFixed(0)} mm · ${(geo.attributes.position.count / 3).toLocaleString()} triangles`;
+    `${s.x.toFixed(0)} × ${s.y.toFixed(0)} × ${s.z.toFixed(0)} mm · ${geo.userData.triangles.toLocaleString()} triangles`;
   const r = new THREE.Box3().setFromObject(mesh).getBoundingSphere(new THREE.Sphere()).radius;
   const dist = r / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * 0.9;
   camera.near = dist / 100; camera.far = dist * 100; camera.updateProjectionMatrix();
