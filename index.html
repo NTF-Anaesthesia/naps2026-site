@@ -7,115 +7,56 @@
 <meta name="description" content="Free, open-licensed 3D-printable adult and paediatric airway trainer models from NAPS 2026. View in your browser and download the STL files.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
 <style>
-  :root {
-    --bg: #f7f6f3;
-    --surface: #ffffff;
-    --surface-2: #f0eee9;
-    --text: #1d1c1a;
-    --muted: #6b6862;
-    --border: #e2dfd8;
-    --accent: #c2410c;
-    --accent-ink: #ffffff;
-    --accent-soft: #fdeee6;
-    --viewer-bg: #ecebe7;
-    --model: #e8a07a;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #141413;
-      --surface: #1d1c1a;
-      --surface-2: #262522;
-      --text: #ecebe7;
-      --muted: #a09d96;
-      --border: #34322e;
-      --accent: #f97316;
-      --accent-ink: #141413;
-      --accent-soft: #3a2316;
-      --viewer-bg: #1a1918;
-      --model: #e8a07a;
-    }
-  }
-  * { box-sizing: border-box; }
-  [hidden] { display: none !important; }
-  html, body { margin: 0; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font: 15px/1.55 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
-    -webkit-font-smoothing: antialiased;
-  }
-  a { color: var(--accent); }
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
-
-  header { padding: 40px 0 24px; }
-  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
-  h1 { font-size: clamp(28px, 4.5vw, 40px); line-height: 1.15; margin: 0 0 12px; letter-spacing: -.02em; }
-  .lede { color: var(--muted); max-width: 640px; margin: 0 0 20px; font-size: 16px; }
-  .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-  .btn {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 10px 16px; border-radius: 10px; border: 1px solid var(--border);
-    background: var(--surface); color: var(--text); font: inherit; font-weight: 600;
-    text-decoration: none; cursor: pointer;
-  }
-  .btn:hover { border-color: var(--muted); }
-  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-  .btn.primary:hover { filter: brightness(1.05); }
-  .btn[disabled] { opacity: .6; cursor: progress; }
-  .btn svg { width: 16px; height: 16px; }
-  #zipStatus { color: var(--muted); font-size: 13px; }
-
   main { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 24px; padding-bottom: 40px; }
   @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
 
   .viewer-card {
     position: sticky; top: 16px; align-self: start;
-    background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden;
+    background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); overflow: hidden;
   }
   @media (max-width: 860px) { .viewer-card { position: static; } }
-  #viewer { position: relative; aspect-ratio: 4 / 3; background: var(--viewer-bg); touch-action: none; }
+  #viewer { position: relative; aspect-ratio: 4 / 3; background: var(--color-viewer); touch-action: none; }
   #viewer canvas { display: block; width: 100%; height: 100%; }
   #overlay {
     position: absolute; inset: 0; display: grid; place-items: center;
-    color: var(--muted); font-size: 14px; pointer-events: none; text-align: center; padding: 16px;
+    color: var(--color-muted); pointer-events: none; text-align: center; padding: 16px;
   }
-  .bar { width: 180px; height: 4px; background: var(--border); border-radius: 2px; margin: 10px auto 0; overflow: hidden; }
-  .bar > i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .1s; }
-  .viewer-meta { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 14px 16px; border-top: 1px solid var(--border); }
-  .viewer-meta h2 { font-size: 16px; margin: 0; }
-  .viewer-meta p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
-  .hint { color: var(--muted); font-size: 12px; padding: 0 16px 14px; margin: 0; }
+  .bar { width: 180px; height: 4px; background: var(--color-border); margin: 10px auto 0; overflow: hidden; }
+  .bar > i { display: block; height: 100%; width: 0; background: var(--color-accent); transition: width .1s; }
+  .viewer-meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 14px 16px; border-top: 1px solid var(--color-border); }
+  .viewer-meta h2 { font-size: 18px; margin: 0; }
+  .viewer-meta p { margin: 2px 0 0; color: var(--color-muted); font-size: 14px; }
+  .hint { color: var(--color-muted); font-size: 14px; padding: 0 16px 14px; margin: 0; }
 
-  .group h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 10px; }
-  .group + .group { margin-top: 24px; }
+  .group h2 { font-size: 20px; margin: 0 0 10px; }
+  .group + .group { margin-top: 28px; }
   .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
   .item {
     display: flex; align-items: center; gap: 12px;
-    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 10px 10px 14px;
+    background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 10px 10px 10px 14px;
   }
-  .item.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+  .item.active { border-color: var(--color-primary); box-shadow: inset 4px 0 0 var(--color-primary); }
   .item button.view {
-    flex: 1; min-width: 0; text-align: left; background: none; border: 0; padding: 0; color: inherit; font: inherit; cursor: pointer;
+    flex: 1; min-width: 0; text-align: left; background: none; border: 0; padding: 4px 0; color: inherit; font: inherit; cursor: pointer;
   }
   .item .name { font-weight: 600; display: block; }
-  .item .sub { color: var(--muted); font-size: 13px; }
-  .tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 999px; background: var(--surface-2); color: var(--muted); margin-left: 4px; vertical-align: 1px; }
+  .item .sub { color: var(--color-muted); font-size: 14px; }
+  .tag { display: inline-block; font-size: 13px; font-weight: 600; padding: 0 6px; border-radius: 4px; background: var(--color-tag); color: var(--color-text); margin-left: 6px; }
   .dl {
-    flex: none; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px;
-    border: 1px solid var(--border); color: var(--text); text-decoration: none;
+    flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: var(--radius);
+    border: 1px solid var(--color-border); color: var(--color-primary); text-decoration: none;
   }
-  .dl:hover { border-color: var(--accent); color: var(--accent); }
-  .dl svg { width: 18px; height: 18px; }
+  .dl:hover { border-color: var(--color-primary); background: var(--color-primary-soft); }
+  .dl svg { width: 20px; height: 20px; }
 
-  section.info { border-top: 1px solid var(--border); padding: 32px 0 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  section.info { border-top: 1px solid var(--color-border); padding: 32px 0 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
   @media (max-width: 760px) { section.info { grid-template-columns: 1fr; } }
-  section.info h2 { font-size: 18px; margin: 0 0 10px; }
-  section.info p, section.info li { color: var(--muted); font-size: 14px; }
-  section.info ul { padding-left: 18px; margin: 0; }
-  section.info li + li { margin-top: 6px; }
-  footer { color: var(--muted); font-size: 13px; padding: 0 0 32px; }
+  section.info h2 { font-size: 22px; margin: 0 0 10px; }
+  section.info ul { padding-left: 20px; margin: 0 0 12px; }
+  section.info li + li { margin-top: 8px; }
 </style>
 <script type="importmap">
 { "imports": {
@@ -126,17 +67,21 @@
 </head>
 <body>
 <div class="wrap">
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <ol>
+      <li>anawj.com</li>
+      <li><span aria-current="page">NAPS 2026 airway trainer</span></li>
+    </ol>
+  </nav>
   <header>
-    <p class="eyebrow">Open 3D-printable models</p>
-    <h1>NAPS 2026 Airway Trainer</h1>
-    <p class="lede">Adult and paediatric airway models for hands-on training. Rotate any part in your browser, then download the STL files to print your own.</p>
+    <h1>Download the NAPS 2026 airway trainer models</h1>
+    <p class="lede">Print your own adult and child airway models for hands-on training. Look at each part in 3D below. Then download the files for your 3D printer. They are free to use for teaching.</p>
     <div class="actions">
       <button class="btn primary" id="zipAll">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
-        Download all (.zip)
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+        Download all models (ZIP, 68 MB)
       </button>
-      <a class="btn" href="#licence">Licence &amp; credits</a>
-      <span id="zipStatus" aria-live="polite"></span>
+      <span class="status" id="zipStatus" aria-live="polite"></span>
     </div>
   </header>
 
@@ -151,11 +96,11 @@
           <p id="curDims">&nbsp;</p>
         </div>
         <a class="btn" id="curDl" href="#" download>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
-          STL
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+          Download this model
         </a>
       </div>
-      <p class="hint">Drag to rotate · scroll or pinch to zoom · right-drag or two-finger drag to pan</p>
+      <p class="hint">Drag to turn the model. Scroll or pinch to zoom. Right-drag or drag with two fingers to move it.</p>
     </div>
 
     <div id="lists"></div>
@@ -163,27 +108,36 @@
 
   <section class="info" id="licence">
     <div>
-      <h2>Licence</h2>
-      <p>Each file has its own licence. The tag next to each model shows which one applies.</p>
+      <h2>How you can use these files</h2>
+      <p>The files use Creative Commons (CC) licences. Each model shows which one applies.</p>
       <ul>
-        <li><strong>CC BY-NC-SA 4.0</strong>: trainer assembly, head and larynx files. You may share and adapt them for non-commercial use with attribution, under the same licence. <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener">Licence text</a></li>
-        <li><strong>CC BY-SA 4.0</strong>: bronchial tree files, matching the upstream BodyParts3D licence. <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="noopener">Licence text</a></li>
+        <li><strong>Non-commercial use only</strong> (<span class="mono">CC BY-NC-SA 4.0</span>): all models except the two bronchus models. You can share and change them, but not sell them. Credit the author and share changes under the same licence. <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener">Read the licence</a></li>
+        <li><strong>Commercial use allowed</strong> (<span class="mono">CC BY-SA 4.0</span>): the adult and child bronchus (airway tree) models. Credit the sources and share changes under the same licence. <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="noopener">Read the licence</a></li>
       </ul>
-      <p>© 2026 Dr. Koh Wenjun. Full terms are in <a href="LICENSE.md">LICENSE.md</a>.</p>
+      <p>© 2026 Dr. Koh Wenjun. <a href="LICENSE.md">Read the full licence terms</a>.</p>
     </div>
     <div>
       <h2>Credits</h2>
       <ul>
-        <li><strong>Author:</strong> Dr. Koh Wenjun</li>
-        <li>Overall design inspired by the <a href="https://makerworld.com/en/models/1979684-cricothyrotomy-trainer" rel="noopener">Cricothyroidotomy Trainer</a> by Kardioversion</li>
-        <li>Larynx modified from the <a href="https://makerworld.com/en/models/591403-upper-airway-model" rel="noopener">Upper Airway Model</a> by flanker1743</li>
-        <li>Bronchial tree modified from <a href="https://lifesciencedb.jp" rel="noopener">BodyParts3D</a>, The Database Center for Life Science (CC BY-SA 2.1 Japan)</li>
+        <li>Made by Dr. Koh Wenjun.</li>
+        <li>The overall design is based on the <a href="https://makerworld.com/en/models/1979684-cricothyrotomy-trainer" rel="noopener">Cricothyroidotomy Trainer</a> by Kardioversion.</li>
+        <li>The larynx is changed from the <a href="https://makerworld.com/en/models/591403-upper-airway-model" rel="noopener">Upper Airway Model</a> by flanker1743.</li>
+        <li>The bronchus is changed from <a href="https://lifesciencedb.jp" rel="noopener">BodyParts3D</a> by The Database Center for Life Science (<span class="mono">CC BY-SA 2.1 Japan</span>).</li>
       </ul>
     </div>
   </section>
-
-  <footer>Models are provided as-is for education and training, not for clinical use.</footer>
 </div>
+
+<footer class="site">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://github.com/flamingbeing/naps2026-site/issues" rel="noopener">Contact</a></li>
+      <li><a href="https://github.com/flamingbeing/naps2026-site/issues/new" rel="noopener">Give feedback</a></li>
+      <li><a href="accessibility.html">Accessibility</a></li>
+    </ul>
+    <p>These models are for teaching and training only. Do not use them for patient care.</p>
+  </div>
+</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
 <script type="module">
@@ -205,26 +159,29 @@ const MODELS = [
   { group: 'Paeds', name: 'Paeds Duck Larynx Large',  file: 'paeds-duck-larynx-large',  size: 3508784, lic: NC },
   { group: 'Paeds', name: 'Paeds Duck Larynx Clip',   file: 'paeds-duck-larynx-clip',   size: 592684,  lic: NC },
 ];
-const GROUP_TITLES = { Adult: 'Adult', Paeds: 'Paediatric' };
+const GROUP_TITLES = { Adult: 'Adult models', Paeds: 'Child (paediatric) models' };
+const LICENCE_LABEL = { [NC]: 'Non-commercial', [SA]: 'Commercial use allowed' };
+// Plain-English display name; m.name stays as the downloaded file name.
+const label = m => m.name.replace(/^Paeds /, 'Child ').replace(/ (\w)/g, (_, c) => ' ' + c.toLowerCase());
 const url = m => `models/${m.file}.stl`;
 const mb = b => (b / 1048576).toFixed(1) + ' MB';
-const DL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>';
+const DL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>';
 
 // ---- list ----
 const lists = document.getElementById('lists');
 for (const g of Object.keys(GROUP_TITLES)) {
   const sec = document.createElement('div');
   sec.className = 'group';
-  sec.innerHTML = `<h3>${GROUP_TITLES[g]}</h3><ul class="list"></ul>`;
+  sec.innerHTML = `<h2>${GROUP_TITLES[g]}</h2><ul class="list"></ul>`;
   const ul = sec.querySelector('ul');
   for (const m of MODELS.filter(m => m.group === g)) {
     const li = document.createElement('li');
     li.className = 'item';
     li.dataset.file = m.file;
     li.innerHTML = `
-      <button class="view" type="button"><span class="name">${m.name}</span>
-        <span class="sub">${mb(m.size)} <span class="tag">CC ${m.lic}</span></span></button>
-      <a class="dl" href="${url(m)}" download="${m.name}.stl" aria-label="Download ${m.name} STL">${DL_ICON}</a>`;
+      <button class="view" type="button"><span class="name">${label(m)}</span>
+        <span class="sub"><span class="mono">${mb(m.size)}</span> <span class="tag" title="CC ${m.lic} 4.0">${LICENCE_LABEL[m.lic]}</span></span></button>
+      <a class="dl" href="${url(m)}" download="${m.name}.stl" aria-label="Download ${label(m)} (STL file, ${mb(m.size)})">${DL_ICON}</a>`;
     li.querySelector('.view').addEventListener('click', () => show(m));
     ul.appendChild(li);
   }
@@ -249,7 +206,7 @@ const key = new THREE.DirectionalLight(0xffffff, 1.6);
 camera.add(key); key.position.set(1, 1, 2);
 scene.add(camera);
 const material = new THREE.MeshStandardMaterial({
-  color: getComputedStyle(document.documentElement).getPropertyValue('--model').trim() || '#e8a07a',
+  color: getComputedStyle(document.documentElement).getPropertyValue('--color-model').trim() || '#e8a07a',
   roughness: 0.6, metalness: 0.05,
 });
 
@@ -313,25 +270,29 @@ function fetchGeometry(m) {
 
 async function show(m) {
   current = m;
-  document.querySelectorAll('.item').forEach(el => el.classList.toggle('active', el.dataset.file === m.file));
-  document.getElementById('curName').textContent = m.name;
+  document.querySelectorAll('.item').forEach(el => {
+    const on = el.dataset.file === m.file;
+    el.classList.toggle('active', on);
+    el.querySelector('.view').setAttribute('aria-pressed', on);
+  });
+  document.getElementById('curName').textContent = label(m);
   document.getElementById('curDims').innerHTML = '&nbsp;';
   const dl = document.getElementById('curDl');
   dl.href = url(m); dl.download = `${m.name}.stl`;
   overlay.hidden = false; bar.hidden = false;
   bar.firstElementChild.style.width = '0%';
-  overlayText.textContent = `Loading ${m.name}…`;
+  overlayText.textContent = `Loading ${label(m)}…`;
   if (mesh) { scene.remove(mesh); mesh = null; }
   let geo;
   try { geo = await fetchGeometry(m); }
-  catch { if (current === m) { overlayText.textContent = 'Could not load this model. Try the download button instead.'; bar.hidden = true; } return; }
+  catch { if (current === m) { overlayText.textContent = 'This model did not load. You can still download it.'; bar.hidden = true; } return; }
   if (current !== m) return;
   overlay.hidden = true;
   mesh = new THREE.Mesh(geo, material);
   scene.add(mesh);
   const box = geo.boundingBox, s = new THREE.Vector3(); box.getSize(s);
-  document.getElementById('curDims').textContent =
-    `${s.x.toFixed(0)} × ${s.y.toFixed(0)} × ${s.z.toFixed(0)} mm · ${geo.userData.triangles.toLocaleString()} triangles`;
+  document.getElementById('curDims').innerHTML =
+    `Size: <span class="mono">${s.x.toFixed(0)} × ${s.y.toFixed(0)} × ${s.z.toFixed(0)} mm</span>`;
   const r = new THREE.Box3().setFromObject(mesh).getBoundingSphere(new THREE.Sphere()).radius;
   const dist = r / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * 0.9;
   camera.near = dist / 100; camera.far = dist * 100; camera.updateProjectionMatrix();
@@ -346,7 +307,7 @@ show(MODELS[0]);
 const zipBtn = document.getElementById('zipAll');
 const zipStatus = document.getElementById('zipStatus');
 zipBtn.addEventListener('click', async () => {
-  if (!window.JSZip) { zipStatus.textContent = 'Still loading, try again in a moment.'; return; }
+  if (!window.JSZip) { zipStatus.textContent = 'The page is still loading. Try again in a few seconds.'; return; }
   zipBtn.disabled = true;
   try {
     const zip = new JSZip();
@@ -364,9 +325,9 @@ zipBtn.addEventListener('click', async () => {
     const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'NAPS 2026 3D Models.zip' });
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 10000);
-    zipStatus.textContent = 'Done.';
+    zipStatus.textContent = 'Your download has started.';
   } catch {
-    zipStatus.textContent = 'Download failed. Grab the files individually below.';
+    zipStatus.textContent = 'The download did not work. Download each model from the list instead.';
   } finally {
     zipBtn.disabled = false;
   }
