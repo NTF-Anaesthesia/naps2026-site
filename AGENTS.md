@@ -29,3 +29,10 @@ GitHub Pages at https://naps2026.anantf.com. **Anything pushed to `main` is publ
   the CSS variables in `site.css`.
 - After editing a page, open it in a browser (or a local static server) and check it still loads
   without console errors before committing.
+
+## Private notes and repo layout
+
+Private notes: `NTF-Anaesthesia/ntf-hub-attach-always` (private, org members only). At the start of a session attach it
+(`add_repo`) and read its `AGENTS.md`; save lasting notes there, never here. Repo layout: one repo per app or app
+group, public code plus a `-private` pair; this repo has no pair (no notes or data); notes go in the hub. A new app
+gets its own repo (test in ntf-hub-attach-always `hub/new-repo.md`), never a folder here.
